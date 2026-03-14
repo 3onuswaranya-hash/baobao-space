@@ -5,21 +5,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>เบา เบา - พื้นที่พักใจ</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap');
+        body { font-family: 'Kanit', sans-serif; }
+    </style>
 </head>
-<body class="bg-[#FDF8F5] text-[#5D4A44] font-sans h-screen flex flex-col items-center justify-center p-6 text-center">
-    
-    <div class="max-w-md">
+<body class="bg-[#FDF8F5] text-[#5D4A44] min-h-screen flex items-center justify-center p-6">
+
+    <div class="max-w-lg w-full bg-white p-8 md:p-12 rounded-[2rem] shadow-xl shadow-[#E8D1C3]/30 border border-[#FAEDE5] text-center">
+        <div class="text-[#DDAF94] mb-6">
+            <svg class="w-16 h-16 mx-auto" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+        </div>
+
         <h1 class="text-4xl font-bold mb-4">เบา เบา</h1>
-        <p class="text-[#87736A] mb-8 text-lg">พื้นที่เล็กๆ ที่พร้อมรับฟังเสมอ</p>
+        <p class="text-[#87736A] mb-8 leading-relaxed">พื้นที่เล็กๆ ที่พร้อมรับฟังเสมอ ไม่ว่าวันนี้จะเจอเรื่องหนักหนาแค่ไหน ทิ้งความรู้สึกไว้ตรงนี้ได้นะ</p>
         
         <form action="https://formspree.io/f/xlgplonr" method="POST" class="space-y-4">
-            <input type="text" name="name" placeholder="ชื่อของคุณ" required class="w-full p-3 rounded-lg border border-[#DDAF94]">
-            <input type="email" name="email" placeholder="อีเมลของคุณ" required class="w-full p-3 rounded-lg border border-[#DDAF94]">
-            <textarea name="message" placeholder="เล่าความรู้สึกของคุณที่นี่..." required class="w-full p-3 rounded-lg border border-[#DDAF94]"></textarea>
-            <button type="submit" class="bg-[#DDAF94] text-white px-8 py-3 rounded-full font-medium w-full hover:bg-[#C89B80]">
-                ส่งข้อความ
+            <input type="text" name="name" placeholder="ชื่อหรือนามแฝงของคุณ" required class="w-full p-4 rounded-2xl border border-[#FAEDE5] bg-[#FDF8F5] focus:ring-2 focus:ring-[#DDAF94] outline-none">
+            <input type="email" name="email" placeholder="อีเมลของคุณ" required class="w-full p-4 rounded-2xl border border-[#FAEDE5] bg-[#FDF8F5] focus:ring-2 focus:ring-[#DDAF94] outline-none">
+            <textarea name="message" rows="4" placeholder="พิมพ์สิ่งที่คุณเจอมาในวันนี้..." required class="w-full p-4 rounded-2xl border border-[#FAEDE5] bg-[#FDF8F5] focus:ring-2 focus:ring-[#DDAF94] outline-none"></textarea>
+            
+            <button type="submit" class="w-full bg-[#DDAF94] hover:bg-[#C89B80] text-white py-4 rounded-2xl font-semibold shadow-md transition-all transform hover:scale-[1.02]">
+                ส่งความรู้สึก
             </button>
         </form>
+
+        <p class="mt-8 text-sm text-[#BCA89F]">พื้นที่นี้ปลอดภัยและเป็นความลับเสมอ</p>
     </div>
 
 </body>

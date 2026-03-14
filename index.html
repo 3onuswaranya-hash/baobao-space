@@ -12,9 +12,14 @@
         <h1 class="text-4xl font-bold mb-4">เบา เบา</h1>
         <p class="text-[#87736A] mb-8 text-lg">พื้นที่เล็กๆ ที่พร้อมรับฟังเสมอ</p>
         
-        <a href="https://formspree.io/f/xlgplonr" class="bg-[#DDAF94] text-white px-8 py-4 rounded-full font-medium shadow-md hover:bg-[#C89B80] transition-all block">
-            เริ่มพูดคุยกับเรา
-        </a>
+        <form action="https://formspree.io/f/xlgplonr" method="POST" class="space-y-4">
+            <input type="text" name="name" placeholder="ชื่อของคุณ" required class="w-full p-3 rounded-lg border border-[#DDAF94]">
+            <input type="email" name="email" placeholder="อีเมลของคุณ" required class="w-full p-3 rounded-lg border border-[#DDAF94]">
+            <textarea name="message" placeholder="เล่าความรู้สึกของคุณที่นี่..." required class="w-full p-3 rounded-lg border border-[#DDAF94]"></textarea>
+            <button type="submit" class="bg-[#DDAF94] text-white px-8 py-3 rounded-full font-medium w-full hover:bg-[#C89B80]">
+                ส่งข้อความ
+            </button>
+        </form>
     </div>
 
 </body>

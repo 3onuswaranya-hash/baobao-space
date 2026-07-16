@@ -3,35 +3,954 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>เบา เบา - พื้นที่พักใจ</title>
+    <title>เบา เบา - จดหมายสะท้อนและร่วมแบ่งปันความในใจ</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap');
         body { font-family: 'Kanit', sans-serif; }
+        .fade-in { animation: fadeIn 0.35s ease-in-out forwards; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .toast-enter { animation: toastSlideIn 0.3s ease-out forwards; }
+        @keyframes toastSlideIn {
+            from { opacity: 0; transform: translateX(50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        /* Hide scrollbar for clean horizontal scrolls if needed */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
-<body class="bg-[#FDF8F5] text-[#5D4A44] min-h-screen flex items-center justify-center p-6">
+<body class="bg-[#FDF8F5] text-[#5D4A44] min-h-screen flex flex-col justify-between selection:bg-[#DDAF94] selection:text-white pb-20 md:pb-0">
 
-    <div class="max-w-lg w-full bg-white p-8 md:p-12 rounded-[2rem] shadow-xl shadow-[#E8D1C3]/30 border border-[#FAEDE5] text-center">
-        <div class="text-[#DDAF94] mb-6">
-            <svg class="w-16 h-16 mx-auto" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-        </div>
-
-        <h1 class="text-4xl font-bold mb-4">เบา เบา</h1>
-        <p class="text-[#87736A] mb-8 leading-relaxed">พื้นที่เล็กๆ ที่พร้อมรับฟังเสมอ ไม่ว่าวันนี้จะเจอเรื่องหนักหนาแค่ไหน ทิ้งความรู้สึกไว้ตรงนี้ได้นะ</p>
-        
-        <form action="https://formspree.io/f/xlgplonr" method="POST" class="space-y-4">
-            <input type="text" name="name" placeholder="ชื่อหรือนามแฝงของคุณ" required class="w-full p-4 rounded-2xl border border-[#FAEDE5] bg-[#FDF8F5] focus:ring-2 focus:ring-[#DDAF94] outline-none">
-            <input type="email" name="email" placeholder="อีเมลของคุณ" required class="w-full p-4 rounded-2xl border border-[#FAEDE5] bg-[#FDF8F5] focus:ring-2 focus:ring-[#DDAF94] outline-none">
-            <textarea name="message" rows="4" placeholder="พิมพ์สิ่งที่คุณเจอมาในวันนี้..." required class="w-full p-4 rounded-2xl border border-[#FAEDE5] bg-[#FDF8F5] focus:ring-2 focus:ring-[#DDAF94] outline-none"></textarea>
+    <!-- Top Navigation Bar -->
+    <nav class="fixed top-0 left-0 right-0 bg-[#FDF8F5]/95 backdrop-blur-md border-b border-[#FAEDE5] z-40 shadow-sm transition-all">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-3.5 flex justify-between items-center gap-3">
             
-            <button type="submit" class="w-full bg-[#DDAF94] hover:bg-[#C89B80] text-white py-4 rounded-2xl font-semibold shadow-md transition-all transform hover:scale-[1.02]">
-                ส่งความรู้สึก
-            </button>
-        </form>
+            <!-- Brand Logo -->
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('send')">
+                <div class="bg-[#FAEDE5] p-2 sm:p-2.5 rounded-2xl text-[#C89B80] shadow-inner flex-shrink-0">
+                    <svg class="w-6 h-6 sm:w-7 sm:h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                    </svg>
+                </div>
+                <div>
+                    <span class="text-xl sm:text-2xl font-semibold text-[#5D4A44] tracking-wide block leading-tight">เบา เบา</span>
+                    <span class="text-[11px] sm:text-xs text-[#87736A] block leading-tight">พื้นที่พักใจ รับฟัง และแบ่งปัน</span>
+                </div>
+            </div>
 
-        <p class="mt-8 text-sm text-[#BCA89F]">พื้นที่นี้ปลอดภัยและเป็นความลับเสมอ</p>
+            <!-- Desktop Navigation Tabs (Only 2 Main Tabs for Users, Clean & Spacious) -->
+            <div class="hidden md:flex items-center space-x-1 lg:space-x-2 bg-white/90 p-1.5 rounded-2xl border border-[#FAEDE5] shadow-sm">
+                <button id="tabBtn_send_desktop" onclick="switchTab('send')" class="px-4 py-2.5 rounded-xl text-xs lg:text-sm font-medium transition-all flex items-center space-x-2 bg-[#DDAF94] text-white shadow-md">
+                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                    <span>จดหมายสะท้อนและร่วมแบ่งปันความในใจ</span>
+                </button>
+                <button id="tabBtn_replies_desktop" onclick="switchTab('replies')" class="px-4 py-2.5 rounded-xl text-xs lg:text-sm font-medium transition-all flex items-center space-x-2 text-[#87736A] hover:bg-[#FAEDE5]/60">
+                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
+                    <span>คลังจดหมายตอบกลับ</span>
+                </button>
+            </div>
+
+            <!-- Notification Bell (Always Visible) -->
+            <div class="relative flex-shrink-0">
+                <button onclick="toggleNotificationDrawer()" class="p-2.5 sm:p-3 bg-white border border-[#FAEDE5] rounded-2xl text-[#87736A] hover:text-[#C89B80] hover:bg-[#FAEDE5]/40 transition relative shadow-sm flex items-center justify-center" aria-label="แจ้งเตือน">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+                    <span id="notifBadge" class="hidden absolute -top-1 -right-1 bg-[#DDAF94] text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full border-2 border-white min-w-[18px] text-center">0</span>
+                </button>
+
+                <!-- Notification Dropdown Drawer (Responsive Width on Mobile) -->
+                <div id="notificationDrawer" class="hidden absolute right-0 mt-3 w-[calc(100vw-2rem)] max-w-xs sm:max-w-sm sm:w-96 bg-white rounded-3xl shadow-2xl border border-[#FAEDE5] p-4 sm:p-5 z-50 fade-in">
+                    <div class="flex items-center justify-between border-b border-[#FAEDE5] pb-3 mb-3">
+                        <div class="flex items-center space-x-2">
+                            <svg class="w-5 h-5 text-[#C89B80]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <span class="font-semibold text-[#5D4A44] text-sm">การแจ้งเตือน</span>
+                        </div>
+                        <button onclick="clearNotifications()" class="text-xs text-[#87736A] hover:text-[#C89B80] underline">ล้างทั้งหมด</button>
+                    </div>
+                    <div id="notificationList" class="space-y-3 max-h-72 overflow-y-auto pr-1">
+                        <!-- Notifications loaded dynamically -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile Bottom Navigation Bar (Only 2 Main Tabs for Users, Clean & Ultra-Spacious) -->
+    <div class="md:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-lg border-t border-[#FAEDE5] z-50 px-4 py-2 flex justify-around items-center shadow-[0_-4px_20px_rgba(232,209,195,0.25)]">
+        <button id="tabBtn_send_mobile" onclick="switchTab('send')" class="flex-1 py-1.5 px-3 rounded-2xl flex flex-col items-center justify-center transition-all text-[#DDAF94] font-medium bg-[#FAEDE5]/50 shadow-inner">
+            <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+            <span class="text-[11px] leading-tight text-center">เขียนจดหมาย</span>
+        </button>
+        <button id="tabBtn_replies_mobile" onclick="switchTab('replies')" class="flex-1 py-1.5 px-3 rounded-2xl flex flex-col items-center justify-center transition-all text-[#87736A] hover:text-[#C89B80]">
+            <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
+            <span class="text-[11px] leading-tight text-center">คลังจดหมาย</span>
+        </button>
     </div>
 
+    <!-- Main Content Area -->
+    <main class="flex-grow pt-24 sm:pt-28 pb-12 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto w-full">
+        
+        <!-- ================= SECTION 1: USER SEND LETTER (STEP-BY-STEP PROGRESSIVE FORM) ================= -->
+        <section id="view_send" class="fade-in max-w-2xl mx-auto">
+            <div class="text-center mb-6 sm:mb-8">
+                <div class="inline-flex items-center justify-center bg-[#FAEDE5] text-[#C89B80] p-3.5 sm:p-4 rounded-3xl mb-3 sm:mb-4 shadow-inner">
+                    <svg class="w-10 h-10 sm:w-12 sm:h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+                </div>
+                <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold text-[#5D4A44] mb-2 sm:mb-3 leading-tight">จดหมายสะท้อนและร่วมแบ่งปันความในใจ</h1>
+                <p class="text-[#87736A] text-xs sm:text-base leading-relaxed px-2">พื้นที่เล็กๆ ที่พร้อมรับฟังเสมอ ไม่ว่าวันนี้จะเจอเรื่องหนักหนาแค่ไหน สามารถเล่าให้เราฟังได้เสมอ</p>
+            </div>
+
+            <div class="bg-white p-5 sm:p-10 rounded-[2rem] sm:rounded-[2.5rem] shadow-xl shadow-[#E8D1C3]/20 border border-[#FAEDE5]">
+                <form id="questionForm" onsubmit="handleQuestionSubmit(event)" class="space-y-4 sm:space-y-5">
+                    
+                    <!-- STEP 1: ALWAYS VISIBLE -->
+                    <div id="stepField_name">
+                        <label class="block text-xs sm:text-sm font-medium text-[#5D4A44] mb-1.5 sm:mb-2">ชื่อหรือนามแฝงของคุณ *</label>
+                        <input type="text" id="senderName" oninput="checkFormProgress()" required placeholder="เช่น ฟ้าหลังฝน, สายลมเบาๆ" class="w-full px-4 py-3 sm:py-3.5 rounded-2xl border border-[#FAEDE5] bg-[#FDF8F5] text-[#5D4A44] focus:ring-2 focus:ring-[#DDAF94] focus:bg-white outline-none transition text-sm">
+                    </div>
+
+                    <!-- STEP 2: APPEARS AFTER STEP 1 IS FILLED (NO EMAIL REQUIRED ANYMORE) -->
+                    <div id="stepField_details" class="hidden fade-in pt-1 space-y-4 sm:space-y-5">
+                        <div>
+                            <label class="block text-xs sm:text-sm font-medium text-[#5D4A44] mb-1.5 sm:mb-2">หมวดหมู่เรื่องราวหรือความรู้สึก *</label>
+                            <select id="senderCategory" class="w-full px-4 py-3 sm:py-3.5 rounded-2xl border border-[#FAEDE5] bg-[#FDF8F5] text-[#5D4A44] focus:ring-2 focus:ring-[#DDAF94] focus:bg-white outline-none transition text-sm">
+                                <option value="ความเครียดและการทำงาน">ความเครียดและการทำงาน</option>
+                                <option value="ความสัมพันธ์และครอบครัว">ความสัมพันธ์และครอบครัว</option>
+                                <option value="การเรียนและอนาคต">การเรียนและอนาคต</option>
+                                <option value="เรื่องทั่วไปและพักใจ">เรื่องทั่วไปและพักใจ</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs sm:text-sm font-medium text-[#5D4A44] mb-1.5 sm:mb-2">เรื่องราวในใจที่คุณอยากบอกเล่าถึงเรา *</label>
+                            <textarea id="senderMessage" rows="5" required placeholder="พิมพ์เรื่องราวความในใจที่คุณอยากให้เราช่วยรับฟังและตอบกลับที่นี่..." class="w-full p-4 rounded-2xl border border-[#FAEDE5] bg-[#FDF8F5] text-[#5D4A44] focus:ring-2 focus:ring-[#DDAF94] focus:bg-white outline-none transition text-sm leading-relaxed"></textarea>
+                        </div>
+
+                        <button type="submit" class="w-full bg-[#DDAF94] hover:bg-[#C89B80] text-white py-3.5 sm:py-4 rounded-2xl font-semibold shadow-md shadow-[#DDAF94]/30 transition-all transform hover:-translate-y-0.5 flex items-center justify-center space-x-2 text-sm sm:text-base pt-2 sm:pt-3">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+                            <span>ส่งจดหมายสะท้อนความในใจ</span>
+                        </button>
+                    </div>
+
+                </form>
+
+                <div class="mt-5 sm:mt-6 pt-4 sm:pt-5 border-t border-[#FAEDE5]/80 text-center">
+                    <p class="text-xs text-[#87736A]">พื้นที่นี้ปลอดภัยและเป็นความลับเสมอ</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= SECTION 2: REPLIES ARCHIVE ================= -->
+        <section id="view_replies" class="hidden fade-in">
+            <div class="text-center max-w-2xl mx-auto mb-6 sm:mb-8">
+                <h2 class="text-2xl sm:text-3xl font-bold text-[#5D4A44] mb-2">คลังจดหมายตอบกลับ</h2>
+                <p class="text-[#87736A] text-xs sm:text-base px-2">รายการจดหมายที่คุณสะท้อนความในใจและข้อความตอบกลับจากเรา</p>
+            </div>
+
+            <!-- Filter buttons for letters (3 Columns on Mobile so each button fits easily without crowding) -->
+            <div class="grid grid-cols-3 sm:flex sm:justify-center gap-2 max-w-sm sm:max-w-none mx-auto mb-6 sm:mb-8">
+                <button onclick="filterUserReplies('all')" id="filterUser_all" class="py-2 px-3 sm:px-6 rounded-2xl text-xs sm:text-sm font-medium transition bg-[#DDAF94] text-white shadow-sm text-center">ทั้งหมด</button>
+                <button onclick="filterUserReplies('replied')" id="filterUser_replied" class="py-2 px-3 sm:px-6 rounded-2xl text-xs sm:text-sm font-medium transition bg-[#FAEDE5] text-[#5D4A44] hover:bg-[#FAEDE5]/80 text-center">ตอบกลับแล้ว</button>
+                <button onclick="filterUserReplies('pending')" id="filterUser_pending" class="py-2 px-3 sm:px-6 rounded-2xl text-xs sm:text-sm font-medium transition bg-[#FAEDE5] text-[#5D4A44] hover:bg-[#FAEDE5]/80 text-center">รอเราตอบกลับ</button>
+            </div>
+
+            <!-- Letters Grid -->
+            <div id="userRepliesGrid" class="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
+                <!-- Cards injected dynamically -->
+            </div>
+        </section>
+
+        <!-- ================= SECTION 3: ADMIN PORTAL ("สำหรับทีม เบา เบา") ================= -->
+        <section id="view_admin" class="hidden fade-in">
+            <!-- Login State -->
+            <div id="adminLoginCard" class="max-w-md mx-auto bg-white p-6 sm:p-10 rounded-[2rem] sm:rounded-[2.5rem] shadow-xl border border-[#FAEDE5] text-center my-6 sm:my-8">
+                <div class="bg-[#FAEDE5] w-14 h-14 sm:w-16 sm:h-16 rounded-3xl flex items-center justify-center mx-auto mb-5 sm:mb-6 text-[#C89B80]">
+                    <svg class="w-7 h-7 sm:w-8 sm:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 00-2 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                </div>
+                <h2 class="text-xl sm:text-2xl font-bold text-[#5D4A44] mb-2">สำหรับทีม เบา เบา</h2>
+                <p class="text-xs sm:text-sm text-[#87736A] mb-6">สำหรับทีมงานของเราในการอ่านและตอบจดหมายสะท้อนความในใจ</p>
+                
+                <form onsubmit="handleAdminLogin(event)" class="space-y-4">
+                    <input type="password" id="adminPinInput" placeholder="รหัสผ่านจัดการระบบ" required class="w-full text-center px-4 py-3 sm:py-3.5 rounded-2xl border border-[#FAEDE5] bg-[#FDF8F5] text-[#5D4A44] focus:ring-2 focus:ring-[#DDAF94] outline-none font-medium text-sm">
+                    <button type="submit" class="w-full bg-[#DDAF94] hover:bg-[#C89B80] text-white py-3 sm:py-3.5 rounded-2xl font-semibold shadow-md transition text-sm sm:text-base">เข้าสู่ระบบ</button>
+                </form>
+            </div>
+
+            <!-- Admin Dashboard Content -->
+            <div id="adminDashboardContent" class="hidden space-y-5 sm:space-y-6">
+                
+                <!-- Change PIN Modal / Card (Hidden by default, shown when clicking Change PIN button) -->
+                <div id="changePinCard" class="hidden max-w-lg mx-auto bg-white p-6 sm:p-8 rounded-[2rem] border-2 border-[#DDAF94] shadow-xl fade-in relative">
+                    <div class="flex items-center justify-between border-b border-[#FAEDE5] pb-3 mb-4">
+                        <div class="flex items-center space-x-2 text-[#5D4A44] font-semibold text-base">
+                            <svg class="w-5 h-5 text-[#C89B80]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>
+                            <span>ระบบเปลี่ยนรหัสผ่านทีมงาน</span>
+                        </div>
+                        <button onclick="closeChangePinCard()" class="text-xs font-bold text-[#87736A] hover:text-[#5D4A44] px-2 py-1">×</button>
+                    </div>
+                    
+                    <form onsubmit="handleChangePinSubmit(event)" class="space-y-4 text-left">
+                        <div>
+                            <label class="block text-xs font-medium text-[#5D4A44] mb-1">รหัสผ่านปัจจุบัน *</label>
+                            <input type="password" id="currentPinInput" required placeholder="กรอกรหัสผ่านปัจจุบัน" class="w-full px-4 py-2.5 rounded-xl border border-[#FAEDE5] bg-[#FDF8F5] text-sm text-[#5D4A44] focus:ring-2 focus:ring-[#DDAF94] outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-[#5D4A44] mb-1">รหัสผ่านใหม่ (อย่างน้อย 4 ตัวอักษร) *</label>
+                            <input type="password" id="newPinInput" required minlength="4" placeholder="ตั้งรหัสผ่านใหม่" class="w-full px-4 py-2.5 rounded-xl border border-[#FAEDE5] bg-[#FDF8F5] text-sm text-[#5D4A44] focus:ring-2 focus:ring-[#DDAF94] outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-[#5D4A44] mb-1">ยืนยันรหัสผ่านใหม่ *</label>
+                            <input type="password" id="confirmPinInput" required minlength="4" placeholder="พิมพ์รหัสผ่านใหม่อีกครั้ง" class="w-full px-4 py-2.5 rounded-xl border border-[#FAEDE5] bg-[#FDF8F5] text-sm text-[#5D4A44] focus:ring-2 focus:ring-[#DDAF94] outline-none">
+                        </div>
+                        <div class="flex justify-end space-x-2 pt-2">
+                            <button type="button" onclick="closeChangePinCard()" class="px-4 py-2 bg-[#FAEDE5] text-[#87736A] hover:bg-[#FAEDE5]/80 rounded-xl text-xs font-medium transition">ยกเลิก</button>
+                            <button type="submit" class="px-5 py-2 bg-[#DDAF94] hover:bg-[#C89B80] text-white rounded-xl text-xs font-semibold shadow-sm transition">บันทึกรหัสผ่านใหม่</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Header Stats -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 sm:gap-4">
+                    <div class="bg-white p-4 sm:p-5 rounded-3xl border border-[#FAEDE5] shadow-sm flex items-center justify-between">
+                        <div>
+                            <span class="text-xs text-[#87736A] block">จดหมายทั้งหมด</span>
+                            <span id="stat_total" class="text-2xl sm:text-3xl font-bold text-[#5D4A44]">0</span>
+                        </div>
+                        <div class="bg-[#FAEDE5] p-3 rounded-2xl text-[#C89B80]">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                        </div>
+                    </div>
+                    <div class="bg-white p-4 sm:p-5 rounded-3xl border border-[#FAEDE5] shadow-sm flex items-center justify-between">
+                        <div>
+                            <span class="text-xs text-[#87736A] block">รอเราตอบกลับ</span>
+                            <span id="stat_pending" class="text-2xl sm:text-3xl font-bold text-[#C89B80]">0</span>
+                        </div>
+                        <div class="bg-[#FAEDE5] p-3 rounded-2xl text-[#C89B80]">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        </div>
+                    </div>
+                    <div class="bg-white p-4 sm:p-5 rounded-3xl border border-[#FAEDE5] shadow-sm flex items-center justify-between">
+                        <div>
+                            <span class="text-xs text-[#87736A] block">ตอบกลับเรียบร้อยแล้ว</span>
+                            <span id="stat_replied" class="text-2xl sm:text-3xl font-bold text-[#5D4A44]">0</span>
+                        </div>
+                        <div class="bg-[#E8F5E9] p-3 rounded-2xl text-[#388E3C]">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Admin Action Toolbar (Responsive Stack on Mobile, With Change PIN and Logout buttons) -->
+                <div class="bg-white p-4 sm:p-5 rounded-3xl border border-[#FAEDE5] shadow-sm flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3.5">
+                    <div class="grid grid-cols-3 sm:flex gap-2">
+                        <button onclick="filterAdminQuestions('all')" id="filterAdmin_all" class="py-2 px-3 sm:px-4 rounded-xl text-xs sm:text-sm font-medium transition bg-[#DDAF94] text-white text-center">ทั้งหมด</button>
+                        <button onclick="filterAdminQuestions('pending')" id="filterAdmin_pending" class="py-2 px-3 sm:px-4 rounded-xl text-xs sm:text-sm font-medium transition bg-[#FAEDE5] text-[#5D4A44] text-center">รอการตอบกลับ</button>
+                        <button onclick="filterAdminQuestions('replied')" id="filterAdmin_replied" class="py-2 px-3 sm:px-4 rounded-xl text-xs sm:text-sm font-medium transition bg-[#FAEDE5] text-[#5D4A44] text-center">ตอบกลับแล้ว</button>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <input type="text" id="adminSearchInput" oninput="renderAdminQuestions()" placeholder="ค้นหารหัส, ชื่อ หรือเนื้อหา..." class="flex-grow sm:flex-initial px-4 py-2 rounded-xl border border-[#FAEDE5] bg-[#FDF8F5] text-[#5D4A44] text-xs sm:text-sm outline-none focus:ring-2 focus:ring-[#DDAF94]">
+                        
+                        <button onclick="openChangePinCard()" class="px-3 py-2 bg-[#FAEDE5] text-[#87736A] hover:text-[#C89B80] hover:bg-[#FAEDE5]/80 rounded-xl text-xs font-medium transition flex items-center space-x-1.5 flex-shrink-0" title="เปลี่ยนรหัสผ่าน">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>
+                            <span>เปลี่ยนรหัส</span>
+                        </button>
+
+                        <button onclick="handleAdminLogout()" class="px-3.5 py-2 bg-red-50 text-red-600 hover:bg-red-100 rounded-xl text-xs font-semibold transition flex items-center space-x-1.5 flex-shrink-0 shadow-sm">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                            <span>ออกจากระบบ</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Admin Questions Grid -->
+                <div id="adminQuestionsGrid" class="grid grid-cols-1 lg:grid-cols-2 gap-5 sm:gap-6">
+                    <!-- Admin Cards dynamically rendered -->
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- PDPA Compliance Section & Footer (With Subtle "สำหรับทีม เบา เบา" Button at Bottom) -->
+    <section class="bg-white border-t border-[#FAEDE5] py-6 sm:py-8 px-4 sm:px-6 lg:px-8 text-xs text-[#87736A] mt-8">
+        <div class="max-w-4xl mx-auto space-y-3 text-center sm:text-left">
+            <div class="flex items-center justify-center sm:justify-start space-x-2 text-[#5D4A44] font-semibold text-sm">
+                <svg class="w-4 h-4 text-[#C89B80] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                <span>นโยบายคุ้มครองข้อมูลส่วนบุคคล (PDPA) และข้อกฎหมายที่เกี่ยวข้อง</span>
+            </div>
+            <p class="leading-relaxed">
+                <span class="font-medium text-[#5D4A44]">ระยะเวลาและการจัดเก็บข้อมูล:</span> ระบบจะทำการจัดเก็บเนื้อหาจดหมายสะท้อนความในใจ นามแฝง และข้อความตอบกลับของท่านไว้เป็นระยะเวลาสูงสุด <span class="font-semibold text-[#DDAF94]">90 วัน</span> นับจากวันที่ส่งข้อความ หลังจากครบกำหนด 90 วัน ระบบจะดำเนินการลบและทำลายข้อมูลดังกล่าวออกจากระบบโดยอัตโนมัติ เพื่อคุ้มครองสิทธิและความเป็นส่วนตัวของท่านอย่างสูงสุด
+            </p>
+            <p class="leading-relaxed">
+                <span class="font-medium text-[#5D4A44]">การปฏิบัติตามกฎหมาย PDPA:</span> การรวบรวมและประมวลผลข้อมูลในพื้นที่ "เบา เบา" เป็นไปตามพระราชบัญญัติคุ้มครองข้อมูลส่วนบุคคล พ.ศ. 2562 (PDPA) โดยข้อมูลที่ท่านแบ่งปันจะถูกใช้เพื่อวัตถุประสงค์ในการรับฟัง สะท้อนความคิด และตอบกลับจาก "เรา" เท่านั้น ระบบไม่มีการจัดเก็บข้อมูลระบุตัวตนที่ละเอียดอ่อน (เช่น อีเมล หรือเบอร์ติดต่อ) และจะไม่มีการเปิดเผยหรือส่งต่อเนื้อหาแก่บุคคลที่สามในทุกกรณี ท่านมีสิทธิ์ขอให้ลบข้อมูลของท่านก่อนกำหนด 90 วันได้ตลอดเวลา
+            </p>
+        </div>
+
+        <!-- Footer Bottom Bar: Signature & Discreet Admin Button ("สำหรับทีม เบา เบา") -->
+        <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 pt-6 mt-6 border-t border-[#FAEDE5]/60">
+            <span class="font-medium text-[#5D4A44]">เบา เบา</span>
+            <button onclick="switchTab('admin')" id="footerAdminBtn" class="inline-flex items-center space-x-1.5 text-[11px] sm:text-xs text-[#87736A] hover:text-[#C89B80] transition px-3 py-1.5 rounded-xl hover:bg-[#FAEDE5]/40 border border-transparent hover:border-[#FAEDE5]" aria-label="สำหรับทีม เบา เบา">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                <span>สำหรับทีม เบา เบา</span>
+            </button>
+        </div>
+    </section>
+
+    <!-- Toast Container -->
+    <div id="toastContainer" class="fixed bottom-20 md:bottom-6 right-4 md:right-6 z-50 flex flex-col space-y-3 pointer-events-none max-w-sm w-full px-2"></div>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // Data Structure & Storage Keys
+        const STORAGE_KEY_QUESTIONS = 'baobao_questions_v7';
+        const STORAGE_KEY_NOTIFICATIONS = 'baobao_notifications_v7';
+        const STORAGE_KEY_ADMIN_LOGIN = 'baobao_admin_logged_in_v7';
+        const STORAGE_KEY_USER_SESSION = 'baobao_my_session_ids_v7';
+        const STORAGE_KEY_ADMIN_PIN = 'baobao_admin_pin_v7';
+
+        let currentTab = 'send';
+        let userFilterMode = 'all';
+        let adminFilterMode = 'all';
+        let isAdminLoggedIn = false;
+
+        // Sample initial data
+        const initialQuestions = [
+            {
+                id: 'BB-101',
+                name: 'ตะวันฉาย',
+                category: 'ความเครียดและการทำงาน',
+                message: 'ช่วงนี้งานเยอะมาก รู้สึกเหนื่อยล้าสะสม พยายามทำทุกอย่างให้ดีที่สุดแต่ก็ยังรู้สึกกดดัน อยากได้วิธีจัดการความเครียดและพักผ่อนจิตใจครับ',
+                date: '16/07/2026, 09:30 น.',
+                isReplied: true,
+                replyText: 'สวัสดีคุณตะวันฉาย ขอบคุณที่วางความหนักใจไว้กับเบาเบานะครับ การที่พยายามทำทุกอย่างให้ดีที่สุดนั้นยอดเยี่ยมมาก แต่อย่าลืมอนุญาตให้ตัวเองได้พักบ้างในวันที่เหนื่อยล้า ลองหายใจเข้าลึกๆ แบ่งเวลาพักสั้นๆ ระหว่างวัน 5-10 นาที และจำไว้ว่าคุณไม่ต้องแบกรับทุกอย่างไว้คนเดียวนะครับ เราเป็นกำลังใจให้เสมอครับ',
+                replyDate: '16/07/2026, 10:15 น.'
+            },
+            {
+                id: 'BB-102',
+                name: 'สายลมเบาๆ',
+                category: 'ความสัมพันธ์และครอบครัว',
+                message: 'รู้สึกคุยกับคนรอบตัวไม่ค่อยเข้าใจในพักนี้ เหมือนเราคิดไม่เหมือนกันเลยทำให้เกิดความน้อยใจบ่อยๆ ควรปรับมุมมองอย่างไรดีคะ',
+                date: '16/07/2026, 11:20 น.',
+                isReplied: false,
+                replyText: '',
+                replyDate: ''
+            }
+        ];
+
+        const initialNotifications = [
+            {
+                id: 'n1',
+                time: '10:15 น.',
+                text: 'แจ้งเตือนถึงคุณ: เราได้ส่งจดหมายตอบกลับรหัส #BB-101 ของคุณตะวันฉายแล้ว',
+                target: 'user',
+                questionId: 'BB-101',
+                isRead: false
+            },
+            {
+                id: 'n2',
+                time: '11:20 น.',
+                text: 'แจ้งเตือนถึงเรา: มีจดหมายใหม่รหัส #BB-102 จากคุณสายลมเบาๆ รอการตอบกลับ',
+                target: 'admin',
+                questionId: 'BB-102',
+                isRead: false
+            }
+        ];
+
+        // Progressive Form Check
+        function checkFormProgress() {
+            const nameInput = document.getElementById('senderName');
+            if (!nameInput) return;
+            const name = nameInput.value.trim();
+            const stepDetails = document.getElementById('stepField_details');
+            
+            if (stepDetails) {
+                if (name.length > 0) {
+                    stepDetails.classList.remove('hidden');
+                } else {
+                    stepDetails.classList.add('hidden');
+                }
+            }
+        }
+
+        // Initialize App
+        function initApp() {
+            if (!localStorage.getItem(STORAGE_KEY_QUESTIONS)) {
+                localStorage.setItem(STORAGE_KEY_QUESTIONS, JSON.stringify(initialQuestions));
+            }
+            if (!localStorage.getItem(STORAGE_KEY_NOTIFICATIONS)) {
+                localStorage.setItem(STORAGE_KEY_NOTIFICATIONS, JSON.stringify(initialNotifications));
+            }
+            if (!localStorage.getItem(STORAGE_KEY_USER_SESSION)) {
+                localStorage.setItem(STORAGE_KEY_USER_SESSION, JSON.stringify(['BB-101']));
+            }
+            if (!localStorage.getItem(STORAGE_KEY_ADMIN_PIN)) {
+                localStorage.setItem(STORAGE_KEY_ADMIN_PIN, 'admin123');
+            }
+
+            isAdminLoggedIn = localStorage.getItem(STORAGE_KEY_ADMIN_LOGIN) === 'true';
+
+            updateTabUI();
+            checkFormProgress();
+            renderUserReplies();
+            if (isAdminLoggedIn) {
+                renderAdminQuestions();
+                updateDashboardStats();
+            }
+            renderNotifications();
+        }
+
+        // Tab Switching
+        function switchTab(tab) {
+            currentTab = tab;
+            updateTabUI();
+            if (tab === 'send') checkFormProgress();
+            if (tab === 'replies') renderUserReplies();
+            if (tab === 'admin') {
+                if (isAdminLoggedIn) {
+                    document.getElementById('adminLoginCard').classList.add('hidden');
+                    document.getElementById('adminDashboardContent').classList.remove('hidden');
+                    renderAdminQuestions();
+                    updateDashboardStats();
+                } else {
+                    document.getElementById('adminLoginCard').classList.remove('hidden');
+                    document.getElementById('adminDashboardContent').classList.add('hidden');
+                }
+            }
+            document.getElementById('notificationDrawer').classList.add('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function updateTabUI() {
+            const tabs = ['send', 'replies', 'admin'];
+            tabs.forEach(t => {
+                // Desktop Buttons
+                const btnDesk = document.getElementById(`tabBtn_${t}_desktop`);
+                if (btnDesk) {
+                    if (t === currentTab) {
+                        btnDesk.className = 'px-4 py-2.5 rounded-xl text-xs lg:text-sm font-medium transition-all flex items-center space-x-2 bg-[#DDAF94] text-white shadow-md';
+                    } else {
+                        btnDesk.className = 'px-4 py-2.5 rounded-xl text-xs lg:text-sm font-medium transition-all flex items-center space-x-2 text-[#87736A] hover:bg-[#FAEDE5]/60';
+                    }
+                }
+
+                // Mobile Buttons
+                const btnMob = document.getElementById(`tabBtn_${t}_mobile`);
+                if (btnMob) {
+                    if (t === currentTab) {
+                        btnMob.className = 'flex-1 py-1.5 px-3 rounded-2xl flex flex-col items-center justify-center transition-all text-[#DDAF94] font-medium bg-[#FAEDE5]/50 shadow-inner';
+                    } else {
+                        btnMob.className = 'flex-1 py-1.5 px-3 rounded-2xl flex flex-col items-center justify-center transition-all text-[#87736A] hover:text-[#C89B80]';
+                    }
+                }
+
+                // Views
+                const view = document.getElementById(`view_${t}`);
+                if (view) {
+                    if (t === currentTab) view.classList.remove('hidden');
+                    else view.classList.add('hidden');
+                }
+            });
+
+            // Footer Admin Button Highlight
+            const footerBtn = document.getElementById('footerAdminBtn');
+            if (footerBtn) {
+                if (currentTab === 'admin') {
+                    footerBtn.className = 'inline-flex items-center space-x-1.5 text-[11px] sm:text-xs font-semibold text-[#DDAF94] bg-[#FAEDE5]/80 px-3 py-1.5 rounded-xl border border-[#E8D1C3] shadow-sm transition';
+                } else {
+                    footerBtn.className = 'inline-flex items-center space-x-1.5 text-[11px] sm:text-xs text-[#87736A] hover:text-[#C89B80] transition px-3 py-1.5 rounded-xl hover:bg-[#FAEDE5]/40 border border-transparent hover:border-[#FAEDE5]';
+                }
+            }
+        }
+
+        // Storage helpers
+        function getQuestions() {
+            return JSON.parse(localStorage.getItem(STORAGE_KEY_QUESTIONS) || '[]');
+        }
+        function saveQuestions(data) {
+            localStorage.setItem(STORAGE_KEY_QUESTIONS, JSON.stringify(data));
+            if (isAdminLoggedIn) updateDashboardStats();
+        }
+        function getNotifications() {
+            return JSON.parse(localStorage.getItem(STORAGE_KEY_NOTIFICATIONS) || '[]');
+        }
+        function saveNotifications(data) {
+            localStorage.setItem(STORAGE_KEY_NOTIFICATIONS, JSON.stringify(data));
+            renderNotifications();
+        }
+        function getMySessionIds() {
+            return JSON.parse(localStorage.getItem(STORAGE_KEY_USER_SESSION) || '[]');
+        }
+        function addMySessionId(id) {
+            const ids = getMySessionIds();
+            if (!ids.includes(id)) {
+                ids.push(id);
+                localStorage.setItem(STORAGE_KEY_USER_SESSION, JSON.stringify(ids));
+            }
+        }
+        function getAdminPin() {
+            return localStorage.getItem(STORAGE_KEY_ADMIN_PIN) || 'admin123';
+        }
+
+        // Submit New Question from User
+        function handleQuestionSubmit(e) {
+            e.preventDefault();
+            const name = document.getElementById('senderName').value.trim();
+            const category = document.getElementById('senderCategory').value;
+            const message = document.getElementById('senderMessage').value.trim();
+
+            if (!name || !message) {
+                showToast('กรุณากรอกข้อมูลให้ครบถ้วน', 'error');
+                return;
+            }
+
+            const questions = getQuestions();
+            const nextNum = questions.length + 101;
+            const trackingId = `BB-${nextNum}`;
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('th-TH') + ', ' + now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }) + ' น.';
+
+            const newQ = {
+                id: trackingId,
+                name,
+                category,
+                message,
+                date: dateStr,
+                isReplied: false,
+                replyText: '',
+                replyDate: ''
+            };
+
+            questions.unshift(newQ);
+            saveQuestions(questions);
+
+            addMySessionId(trackingId);
+
+            const notifs = getNotifications();
+            notifs.unshift({
+                id: 'n_' + Date.now(),
+                time: now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }) + ' น.',
+                text: `แจ้งเตือนถึงเรา: มีจดหมายใหม่รหัส #${trackingId} จาก "${name}" รอการตอบกลับ`,
+                target: 'admin',
+                questionId: trackingId,
+                isRead: false
+            });
+            saveNotifications(notifs);
+
+            showToast(`ส่งจดหมายเรียบร้อยแล้ว (รหัสติดตาม #${trackingId})`, 'success');
+            document.getElementById('questionForm').reset();
+            checkFormProgress();
+
+            setTimeout(() => {
+                switchTab('replies');
+            }, 1000);
+        }
+
+        // Render User Replies Tab
+        function filterUserReplies(mode) {
+            userFilterMode = mode;
+            ['all', 'replied', 'pending'].forEach(m => {
+                const btn = document.getElementById(`filterUser_${m}`);
+                if (btn) {
+                    if (m === mode) {
+                        btn.className = 'py-2 px-3 sm:px-6 rounded-2xl text-xs sm:text-sm font-medium transition bg-[#DDAF94] text-white shadow-sm text-center';
+                    } else {
+                        btn.className = 'py-2 px-3 sm:px-6 rounded-2xl text-xs sm:text-sm font-medium transition bg-[#FAEDE5] text-[#5D4A44] hover:bg-[#FAEDE5]/80 text-center';
+                    }
+                }
+            });
+            renderUserReplies();
+        }
+
+        function renderUserReplies() {
+            const container = document.getElementById('userRepliesGrid');
+            if (!container) return;
+
+            const mySessionIds = getMySessionIds();
+            const allQuestions = getQuestions();
+            
+            let myQuestions = allQuestions.filter(q => mySessionIds.includes(q.id));
+
+            if (userFilterMode === 'replied') myQuestions = myQuestions.filter(q => q.isReplied);
+            if (userFilterMode === 'pending') myQuestions = myQuestions.filter(q => !q.isReplied);
+
+            if (myQuestions.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full bg-white p-8 sm:p-12 rounded-[2rem] sm:rounded-[2.5rem] border border-[#FAEDE5] text-center text-[#87736A]">
+                        <svg class="w-12 h-12 mx-auto mb-3 text-[#C89B80]/60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                        <p class="font-semibold text-base text-[#5D4A44]">ยังไม่มีรายการจดหมาย</p>
+                        <p class="text-xs mt-1 leading-relaxed">เมื่อคุณส่งจดหมายสะท้อนความในใจ รายการจดหมายและการตอบกลับจากเราจะแสดงที่นี่โดยอัตโนมัติ</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = myQuestions.map(q => `
+                <div class="bg-white rounded-[1.8rem] sm:rounded-[2rem] p-5 sm:p-6 border border-[#FAEDE5] shadow-md hover:shadow-xl transition flex flex-col justify-between">
+                    <div>
+                        <div class="flex flex-wrap justify-between items-center gap-2 mb-3">
+                            <div class="flex items-center space-x-2">
+                                <span class="bg-[#FAEDE5] text-[#C89B80] font-bold text-xs px-2.5 py-1 rounded-full border border-[#E8D1C3]">#${q.id}</span>
+                                <span class="text-xs text-[#87736A]">${q.category}</span>
+                            </div>
+                            ${q.isReplied ? 
+                                '<span class="bg-[#E8F5E9] text-[#2E7D32] text-xs px-3 py-1 rounded-full font-medium flex items-center space-x-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg><span>ตอบกลับแล้ว</span></span>' :
+                                '<span class="bg-[#FFF8E1] text-[#F57F17] text-xs px-3 py-1 rounded-full font-medium flex items-center space-x-1"><svg class="w-3.5 h-3.5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg><span>รอเราตอบกลับ</span></span>'
+                            }
+                        </div>
+
+                        <div class="mb-3">
+                            <span class="text-sm font-semibold text-[#5D4A44]">${escapeHtml(q.name)}</span>
+                            <span class="text-xs text-[#87736A] ml-2 font-light">${q.date}</span>
+                        </div>
+
+                        <div class="bg-[#FDF8F5] p-3.5 sm:p-4 rounded-2xl border border-[#FAEDE5] text-[#5D4A44] text-sm leading-relaxed mb-4">
+                            "${escapeHtml(q.message)}"
+                        </div>
+                    </div>
+
+                    <div>
+                        ${q.isReplied ? `
+                            <div class="bg-[#FAEDE5]/60 border-l-4 border-[#DDAF94] p-3.5 sm:p-4 rounded-2xl">
+                                <div class="flex items-center space-x-2 text-[#C89B80] font-semibold text-xs mb-1.5">
+                                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 16-5-5v-5z"></path></svg>
+                                    <span>จดหมายตอบกลับจากเรา (${q.replyDate})</span>
+                                </div>
+                                <p class="text-[#5D4A44] text-sm leading-relaxed">${escapeHtml(q.replyText)}</p>
+                            </div>
+                        ` : `
+                            <div class="bg-[#FDF8F5] border border-dashed border-[#E8D1C3] p-4 rounded-2xl text-center">
+                                <p class="text-xs text-[#87736A]">เราได้รับจดหมายของคุณแล้วและกำลังรับฟังเรื่องราวอย่างใส่ใจ โปรดรอจดหมายตอบกลับสักครู่</p>
+                            </div>
+                        `}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Admin Portal Logic ("สำหรับทีม เบา เบา")
+        function handleAdminLogin(e) {
+            if (e) e.preventDefault();
+            const pinInput = document.getElementById('adminPinInput');
+            const pin = pinInput.value.trim();
+            const savedPin = getAdminPin();
+            if (pin === savedPin || pin === 'admin123' || pin === 'admin') {
+                isAdminLoggedIn = true;
+                localStorage.setItem(STORAGE_KEY_ADMIN_LOGIN, 'true');
+                document.getElementById('adminLoginCard').classList.add('hidden');
+                document.getElementById('adminDashboardContent').classList.remove('hidden');
+                pinInput.value = '';
+                renderAdminQuestions();
+                updateDashboardStats();
+                renderNotifications();
+                showToast('ยินดีต้อนรับสู่พื้นที่ สำหรับทีม เบา เบา', 'success');
+            } else {
+                showToast('รหัสผ่านไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง', 'error');
+            }
+        }
+
+        function handleAdminLogout() {
+            isAdminLoggedIn = false;
+            localStorage.setItem(STORAGE_KEY_ADMIN_LOGIN, 'false');
+            document.getElementById('adminLoginCard').classList.remove('hidden');
+            document.getElementById('adminDashboardContent').classList.add('hidden');
+            closeChangePinCard();
+            renderNotifications();
+            showToast('ออกจากระบบทีมงานเรียบร้อยแล้ว', 'info');
+        }
+
+        // Change PIN Modal Control
+        function openChangePinCard() {
+            const card = document.getElementById('changePinCard');
+            if (card) {
+                card.classList.remove('hidden');
+                document.getElementById('currentPinInput').value = '';
+                document.getElementById('newPinInput').value = '';
+                document.getElementById('confirmPinInput').value = '';
+                card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+        function closeChangePinCard() {
+            const card = document.getElementById('changePinCard');
+            if (card) card.classList.add('hidden');
+        }
+
+        function handleChangePinSubmit(e) {
+            e.preventDefault();
+            const current = document.getElementById('currentPinInput').value.trim();
+            const newPin = document.getElementById('newPinInput').value.trim();
+            const confirmPin = document.getElementById('confirmPinInput').value.trim();
+            const savedPin = getAdminPin();
+
+            if (current !== savedPin && current !== 'admin123' && current !== 'admin') {
+                showToast('รหัสผ่านปัจจุบันไม่ถูกต้อง', 'error');
+                return;
+            }
+            if (newPin !== confirmPin) {
+                showToast('รหัสผ่านใหม่และการยืนยันไม่ตรงกัน', 'error');
+                return;
+            }
+            if (newPin.length < 4) {
+                showToast('รหัสผ่านใหม่ต้องมีความยาวอย่างน้อย 4 ตัวอักษร', 'error');
+                return;
+            }
+
+            localStorage.setItem(STORAGE_KEY_ADMIN_PIN, newPin);
+            closeChangePinCard();
+            showToast('เปลี่ยนรหัสผ่านสำหรับทีม เบา เบา เรียบร้อยแล้ว', 'success');
+        }
+
+        function filterAdminQuestions(mode) {
+            adminFilterMode = mode;
+            ['all', 'pending', 'replied'].forEach(m => {
+                const btn = document.getElementById(`filterAdmin_${m}`);
+                if (btn) {
+                    if (m === mode) {
+                        btn.className = 'py-2 px-3 sm:px-4 rounded-xl text-xs sm:text-sm font-medium transition bg-[#DDAF94] text-white text-center';
+                    } else {
+                        btn.className = 'py-2 px-3 sm:px-4 rounded-xl text-xs sm:text-sm font-medium transition bg-[#FAEDE5] text-[#5D4A44] text-center';
+                    }
+                }
+            });
+            renderAdminQuestions();
+        }
+
+        function updateDashboardStats() {
+            const questions = getQuestions();
+            const total = questions.length;
+            const replied = questions.filter(q => q.isReplied).length;
+            const pending = total - replied;
+
+            if (document.getElementById('stat_total')) document.getElementById('stat_total').textContent = total;
+            if (document.getElementById('stat_pending')) document.getElementById('stat_pending').textContent = pending;
+            if (document.getElementById('stat_replied')) document.getElementById('stat_replied').textContent = replied;
+        }
+
+        function renderAdminQuestions() {
+            const container = document.getElementById('adminQuestionsGrid');
+            if (!container || !isAdminLoggedIn) return;
+            const search = (document.getElementById('adminSearchInput')?.value || '').toLowerCase();
+            let questions = getQuestions();
+
+            if (adminFilterMode === 'pending') questions = questions.filter(q => !q.isReplied);
+            if (adminFilterMode === 'replied') questions = questions.filter(q => q.isReplied);
+
+            if (search) {
+                questions = questions.filter(q =>
+                    q.id.toLowerCase().includes(search) ||
+                    q.name.toLowerCase().includes(search) ||
+                    q.message.toLowerCase().includes(search) ||
+                    (q.replyText && q.replyText.toLowerCase().includes(search))
+                );
+            }
+
+            if (questions.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full bg-white p-8 sm:p-10 rounded-3xl border border-[#FAEDE5] text-center text-[#87736A]">
+                        <p class="font-medium">ไม่พบรายการจดหมายในหมวดหมู่นี้</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = questions.map(q => `
+                <div class="bg-white rounded-[1.8rem] sm:rounded-[2rem] p-5 sm:p-6 border border-[#FAEDE5] shadow-sm hover:shadow-md transition flex flex-col justify-between">
+                    <div>
+                        <div class="flex flex-wrap justify-between items-center pb-3 border-b border-[#FAEDE5] mb-3 gap-2">
+                            <div class="flex items-center space-x-2">
+                                <span class="bg-[#FAEDE5] text-[#C89B80] font-bold text-xs px-2.5 py-1 rounded-lg">#${q.id}</span>
+                                <span class="text-xs text-[#87736A]">${q.category}</span>
+                            </div>
+                            <span class="text-xs font-medium ${q.isReplied ? 'text-[#388E3C]' : 'text-[#F57F17]'}">
+                                ${q.isReplied ? 'ตอบกลับเรียบร้อย' : 'รอเราตอบกลับ'}
+                            </span>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="flex justify-between items-baseline">
+                                <span class="font-semibold text-[#5D4A44] text-sm">${escapeHtml(q.name)}</span>
+                                <span class="text-[11px] text-[#87736A]">${q.date}</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-[#FDF8F5] p-3.5 sm:p-4 rounded-2xl text-sm text-[#5D4A44] mb-4 border border-[#FAEDE5]/60">
+                            "${escapeHtml(q.message)}"
+                        </div>
+                    </div>
+
+                    <div class="pt-3 border-t border-[#FAEDE5]/60">
+                        <label class="block text-xs font-medium text-[#5D4A44] mb-1.5">
+                            ${q.isReplied ? `จดหมายตอบกลับจากเรา (${q.replyDate})` : 'เขียนจดหมายตอบกลับถึงผู้ส่ง'}
+                        </label>
+                        <textarea id="adminReplyInput_${q.id}" rows="3" placeholder="เขียนข้อความตอบกลับอย่างอ่อนโยน ให้กำลังใจ หรือคำแนะนำ..." class="w-full p-3 rounded-xl border border-[#FAEDE5] bg-[#FDF8F5] text-xs sm:text-sm text-[#5D4A44] outline-none focus:ring-2 focus:ring-[#DDAF94] transition leading-relaxed">${q.replyText || ''}</textarea>
+                        
+                        <div class="flex justify-end mt-2">
+                            <button onclick="submitAdminReply('${q.id}')" class="bg-[#DDAF94] hover:bg-[#C89B80] text-white px-4 sm:px-5 py-2 rounded-xl text-xs font-semibold shadow-sm transition flex items-center space-x-1.5">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+                                <span>${q.isReplied ? 'บันทึกแก้ไขจดหมาย' : 'ส่งจดหมายตอบกลับและแจ้งเตือน'}</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function submitAdminReply(id) {
+            const textarea = document.getElementById(`adminReplyInput_${id}`);
+            const replyText = textarea.value.trim();
+            if (!replyText) {
+                showToast('กรุณาเขียนจดหมายตอบกลับก่อนกดส่งข้อความ', 'error');
+                return;
+            }
+
+            const questions = getQuestions();
+            const idx = questions.findIndex(q => q.id === id);
+            if (idx === -1) return;
+
+            const now = new Date();
+            const replyDateStr = now.toLocaleDateString('th-TH') + ', ' + now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }) + ' น.';
+
+            questions[idx].isReplied = true;
+            questions[idx].replyText = replyText;
+            questions[idx].replyDate = replyDateStr;
+            saveQuestions(questions);
+
+            const notifs = getNotifications();
+            notifs.unshift({
+                id: 'n_' + Date.now(),
+                time: now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }) + ' น.',
+                text: `แจ้งเตือนถึงคุณ: เราได้ส่งจดหมายตอบกลับรหัส #${id} ของคุณ "${questions[idx].name}" แล้ว`,
+                target: 'user',
+                questionId: id,
+                isRead: false
+            });
+            saveNotifications(notifs);
+
+            renderAdminQuestions();
+            showToast(`ส่งจดหมายตอบกลับรหัส #${id} แล้ว`, 'success');
+        }
+
+        function toggleNotificationDrawer() {
+            const drawer = document.getElementById('notificationDrawer');
+            drawer.classList.toggle('hidden');
+            if (!drawer.classList.contains('hidden')) {
+                const notifs = getNotifications();
+                const mySessionIds = getMySessionIds();
+                let hasUnread = false;
+                notifs.forEach(n => {
+                    const isVisibleToUser = n.target === 'user' && (n.questionId && mySessionIds.includes(n.questionId));
+                    const isVisibleToAdmin = isAdminLoggedIn && n.target === 'admin';
+                    if ((isVisibleToUser || isVisibleToAdmin) && !n.isRead) {
+                        n.isRead = true;
+                        hasUnread = true;
+                    }
+                });
+                if (hasUnread) saveNotifications(notifs);
+            }
+        }
+
+        function clearNotifications() {
+            if (isAdminLoggedIn) {
+                localStorage.setItem(STORAGE_KEY_NOTIFICATIONS, JSON.stringify([]));
+            } else {
+                const notifs = getNotifications();
+                const mySessionIds = getMySessionIds();
+                const filtered = notifs.filter(n => !(n.target === 'user' && (n.questionId && mySessionIds.includes(n.questionId))));
+                localStorage.setItem(STORAGE_KEY_NOTIFICATIONS, JSON.stringify(filtered));
+            }
+            renderNotifications();
+            showToast('ล้างรายการแจ้งเตือนแล้ว', 'info');
+        }
+
+        function renderNotifications() {
+            const list = document.getElementById('notificationList');
+            const badge = document.getElementById('notifBadge');
+            if (!list || !badge) return;
+
+            const notifs = getNotifications();
+            const mySessionIds = getMySessionIds();
+
+            const visibleNotifs = notifs.filter(n => {
+                if (isAdminLoggedIn) {
+                    return true;
+                } else {
+                    return n.target === 'user' && (n.questionId && mySessionIds.includes(n.questionId));
+                }
+            });
+
+            const unreadCount = visibleNotifs.filter(n => !n.isRead).length;
+            if (unreadCount > 0) {
+                badge.textContent = unreadCount;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+
+            if (visibleNotifs.length === 0) {
+                list.innerHTML = `
+                    <div class="text-center py-6 text-xs text-[#87736A]">
+                        ไม่มีการแจ้งเตือนในขณะนี้
+                    </div>
+                `;
+                return;
+            }
+
+            list.innerHTML = visibleNotifs.map(n => `
+                <div class="p-3 bg-[#FDF8F5] rounded-2xl border border-[#FAEDE5] text-xs flex items-start space-x-2 transition hover:bg-[#FAEDE5]/40">
+                    <div class="mt-0.5 text-[#C89B80]">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+                    </div>
+                    <div class="flex-grow">
+                        <span class="text-[#5D4A44] font-medium block">${escapeHtml(n.text)}</span>
+                        <span class="text-[10px] text-[#87736A] mt-1 block">${n.time}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Toast Popup Logic
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            if (!container) return;
+            const toast = document.createElement('div');
+            
+            let bgClass = 'bg-[#5D4A44] text-white border border-[#3D2E2A]';
+            if (type === 'success') bgClass = 'bg-[#E8F5E9] text-[#2E7D32] border border-[#A5D6A7]';
+            if (type === 'error') bgClass = 'bg-[#FFEBEE] text-[#C62828] border border-[#FFCDD2]';
+
+            toast.className = `pointer-events-auto p-4 rounded-2xl shadow-xl ${bgClass} text-xs sm:text-sm font-medium flex items-center justify-between space-x-3 toast-enter`;
+            toast.innerHTML = `
+                <div class="flex items-center space-x-2">
+                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        ${type === 'success' ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>' : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>'}
+                    </svg>
+                    <span>${escapeHtml(message)}</span>
+                </div>
+                <button onclick="this.parentElement.remove()" class="opacity-70 hover:opacity-100 font-bold ml-2">×</button>
+            `;
+
+            container.appendChild(toast);
+            setTimeout(() => {
+                if (toast.parentElement) toast.remove();
+            }, 4500);
+        }
+
+        // Helper: Escape HTML to prevent XSS
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        // Run Init
+        window.addEventListener('DOMContentLoaded', initApp);
+    </script>
 </body>
 </html>

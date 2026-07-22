@@ -327,7 +327,7 @@
         // ==========================================
         const SUPABASE_URL = 'https://jrcipftbanxvorydvqio.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpyY2lwZnRiYW54dm9yeWR2cWlvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ3MDIxMDcsImV4cCI6MjEwMDI3ODEwN30.bjTOAtCMDMIbw8mPCitc2MJMYH62gcw2W8bj_8NClmo';
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         // ==========================================
         // LOCAL STATE & STORAGE KEYS
@@ -372,7 +372,7 @@
             
             // Try auto-login admin if PIN is saved
             if (adminPin) {
-                const { data, error } = await supabase.rpc('admin_get_all_questions', { p_pin: adminPin });
+                const { data, error } = await db.rpc('admin_get_all_questions', { p_pin: adminPin });
                 if (!error) {
                     isAdminLoggedIn = true;
                     adminQuestions = data;
@@ -396,8 +396,8 @@
             // Fetch User Data
             if (mySecrets.length > 0) {
                 const [qRes, nRes] = await Promise.all([
-                    supabase.rpc('get_my_questions', { p_secrets: mySecrets }),
-                    supabase.rpc('get_my_notifications', { p_secrets: mySecrets })
+                    db.rpc('get_my_questions', { p_secrets: mySecrets }),
+                    db.rpc('get_my_notifications', { p_secrets: mySecrets })
                 ]);
                 if (!qRes.error) userQuestions = qRes.data;
                 if (!nRes.error) {
@@ -413,8 +413,8 @@
             // Fetch Admin Data
             if (isAdminLoggedIn && adminPin) {
                 const [qRes, nRes] = await Promise.all([
-                    supabase.rpc('admin_get_all_questions', { p_pin: adminPin }),
-                    supabase.rpc('admin_get_notifications', { p_pin: adminPin })
+                    db.rpc('admin_get_all_questions', { p_pin: adminPin }),
+                    db.rpc('admin_get_notifications', { p_pin: adminPin })
                 ]);
                 if (!qRes.error) adminQuestions = qRes.data;
                 if (!nRes.error) {
@@ -509,7 +509,7 @@
             btn.disabled = true;
             btn.innerHTML = '<svg class="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg> <span>กำลังส่งจดหมาย...</span>';
 
-            const { data, error } = await supabase.rpc('submit_question', {
+            const { data, error } = await db.rpc('submit_question', {
                 p_name: name,
                 p_category: category,
                 p_message: message
@@ -615,7 +615,7 @@
             btn.disabled = true;
             btn.innerHTML = '<svg class="w-5 h-5 animate-spin mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>';
 
-            const { data, error } = await supabase.rpc('admin_get_all_questions', { p_pin: pin });
+            const { data, error } = await db.rpc('admin_get_all_questions', { p_pin: pin });
             
             btn.disabled = false;
             btn.innerHTML = 'เข้าสู่ระบบ';
@@ -741,7 +741,7 @@
             btn.disabled = true;
             btn.innerHTML = '<svg class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg> กำลังส่ง...';
 
-            const { error } = await supabase.rpc('admin_submit_reply', {
+            const { error } = await db.rpc('admin_submit_reply', {
                 p_pin: adminPin,
                 p_id: id,
                 p_reply_text: replyText
@@ -796,7 +796,7 @@
             btn.disabled = true;
             btn.innerHTML = 'กำลังบันทึก...';
 
-            const { error } = await supabase.rpc('admin_change_pin', {
+            const { error } = await db.rpc('admin_change_pin', {
                 p_old_pin: current,
                 p_new_pin: newPin
             });
@@ -828,7 +828,7 @@
                 if (unread.length > 0) {
                     for (const n of unread) {
                         n.is_read = true; // Optimistic UI
-                        supabase.rpc('mark_notification_read', { p_notif_id: n.id }).then();
+                        db.rpc('mark_notification_read', { p_notif_id: n.id }).then();
                     }
                     renderNotifications();
                 }

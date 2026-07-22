@@ -429,7 +429,7 @@ export default function App() {
               </form>
 
               <div className="mt-5 sm:mt-6 pt-4 sm:pt-5 border-t border-[#FAEDE5]/80 text-center">
-                <p className="text-xs text-[#87736A]">พื้นที่นี้ปลอดภัยและเป็นความลับเสมอ ข้อมูลเชื่อมต่อกับ Supabase แล้ว</p>
+                <p className="text-xs text-[#87736A]">พื้นที่นี้ปลอดภัยและเป็นความลับเสมอ</p>
               </div>
             </div>
           </section>
